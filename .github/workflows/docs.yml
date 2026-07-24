@@ -25,8 +25,13 @@ jobs:
       - name: PSScriptAnalyzer
         shell: pwsh
         run: |
-          Set-PSRepository PSGallery -InstallationPolicy Trusted
-          Install-Module PSScriptAnalyzer -Force -Scope CurrentUser
+          # Auf den GitHub-Runnern ist PSScriptAnalyzer vorinstalliert. Ein
+          # Install-Module darauf warnt nur, dass das Modul bereits in
+          # Benutzung ist, und laesst das Protokoll unnoetig unruhig aussehen.
+          if (-not (Get-Module -ListAvailable PSScriptAnalyzer)) {
+            Set-PSRepository PSGallery -InstallationPolicy Trusted
+            Install-Module PSScriptAnalyzer -Force -Scope CurrentUser
+          }
           $found = Invoke-ScriptAnalyzer -Path ./scripts -Recurse `
                      -Settings ./.github/PSScriptAnalyzerSettings.psd1
           if ($found) {

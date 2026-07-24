@@ -70,7 +70,7 @@ function Get-RmsLevel {
     return $null
 }
 
-function Get-Lufs {
+function Get-Loudness {
     param([string] $File)
 
     $output = Invoke-Native -FilePath 'ffmpeg' -Capture -Arguments @(
@@ -95,7 +95,7 @@ foreach ($f in $Files) {
     $format = (& ffprobe -v error -select_streams a:0 `
                  -show_entries stream=codec_name,sample_rate -of csv=p=0 $f) -join ','
 
-    $lufs = Get-Lufs -File $f
+    $lufs = Get-Loudness -File $f
     $rms  = Get-RmsLevel -File $f -FilterGraph 'astats=metadata=0'
     $stats[$f] = $rms
 

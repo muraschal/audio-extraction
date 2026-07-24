@@ -41,7 +41,16 @@ Write-Host "  ffmpeg -> $(Assert-Tool -Name 'ffmpeg' -Hint "Installierbar mit 'w
 # GPU ermitteln, um den passenden PyTorch-Build zu wählen.
 if (-not $TorchIndex) {
     $gpu = $null
-    try { $gpu = (nvidia-smi --query-gpu=name --format=csv,noheader) 2>$null } catch { }
+    try {
+        $gpu = (nvidia-smi --query-gpu=name --format=csv,noheader) 2>$null
+    }
+    catch {
+        # nvidia-smi fehlt, wenn kein NVIDIA-Treiber installiert ist. Das ist
+        # kein Fehler, sondern genau die gesuchte Auskunft: Es gibt keine
+        # passende GPU, also wird unten der CPU-Build gewählt.
+        Write-Verbose "nvidia-smi nicht verfügbar: $($_.Exception.Message)"
+        $gpu = $null
+    }
 
     if ($gpu) {
         Write-Host "  GPU  -> $gpu"
