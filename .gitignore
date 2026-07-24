@@ -1,0 +1,17 @@
+# Allowlist-Prinzip: erst alles im Wurzelverzeichnis ignorieren, dann
+# gezielt die Dateien wieder zulassen, die versioniert gehoeren.
+#
+# Bewusst so gewaehlt und nicht als uebliche Deny-Liste: dieser Ordner ist
+# zugleich Arbeitsverzeichnis und enthaelt urheberrechtlich geschuetztes
+# Audiomaterial, eine ~3 GB grosse venv sowie Modell-Checkpoints. Bei einer
+# Deny-Liste wuerde jede neu entstehende Datei standardmaessig committet.
+# Hier ist es umgekehrt: neue Dateien sind stumm, bis sie jemand bewusst
+# zulaesst. Bei einem oeffentlichen Repository ist das die richtige Richtung.
+
+/*
+
+!/.gitignore
+!/LICENSE
+!/README.md
+!/scripts/
+!/docs/
