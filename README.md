@@ -13,8 +13,16 @@ Gesang aus einem Song entfernen — lokal auf der eigenen GPU, in messbarer Qual
 >
 > **Was es besser macht.** Vergleichbare Onlinedienste liefern im Gratistarif 16 Bit, arbeiten mit Warteschlangen und verlangen den Upload des Materials. Hier bleibt alles lokal, die Ausgabe erfolgt in 32-Bit-Float, und ein Durchgang dauert Sekunden statt Minuten. Vor allem aber misst `compare.ps1`, ob sich zwei Ergebnisse überhaupt hörbar unterscheiden — statt dass du dich auf Benchmark-Tabellen verlassen musst.
 
+> [!TIP]
+> **Noch nie mit der Kommandozeile gearbeitet?** Dann fang nicht hier an,
+> sondern bei **[Erste Schritte](docs/erste-schritte.md)**. Diese Anleitung
+> führt dich vom leeren Rechner bis zum fertigen Instrumental, erklärt jeden
+> Befehl und setzt nichts voraus. Das restliche README richtet sich an Leser,
+> die PowerShell und git bereits kennen.
+
 ## Inhalt
 
+- [Erste Schritte für Einsteiger](docs/erste-schritte.md) — eigene Anleitung ohne Vorkenntnisse
 - [Warum lokal](#warum-lokal)
 - [So läuft es ab](#so-läuft-es-ab)
 - [Voraussetzungen](#voraussetzungen)
@@ -219,7 +227,7 @@ Sechs Dinge, die beim Aufbau Zeit gekostet haben und in den Skripten bereits ber
 **PowerShell 5.1 liest `.ps1`-Dateien ohne BOM in der ANSI-Codepage.** Ein Skript mit Umlauten braucht deshalb zwingend ein UTF-8-BOM (`EF BB BF`), sonst kommen die Zeichen falsch an. Das bleibt selten bei blossem Schönheitsfehler: Ein Geviertstrich wird als ANSI zu einem typografischen Anführungszeichen, das PowerShell als String-Ende liest — die Datei parst dann gar nicht mehr. Für Markdown gilt das nicht, dort ist UTF-8 ohne BOM richtig.
 
 > [!WARNING]
-> Aus demselben Grund lassen sich Umlaute nicht zuverlässig per PowerShell-Skript in Dateien ersetzen. Liest ein solches Skript sein eigenes Ersetzungsmuster als ANSI, schreibt es doppelt kodiertes UTF-8 (`Ã¼` statt `ü`). Das rückgängig zu machen ist verlustbehaftet, weil Windows-1252 und ISO-8859-1 sich im Bereich 0x80–0x9F unterscheiden — genau dort, wo Ä, Ö und Ü landen.
+> Aus demselben Grund lassen sich Umlaute nicht zuverlässig per PowerShell-Skript in Dateien ersetzen. Liest ein solches Skript sein eigenes Ersetzungsmuster als ANSI, schreibt es doppelt kodiertes UTF-8 (`Ã¼` statt `ü`). <!-- mojibake-ok --> Das rückgängig zu machen ist verlustbehaftet, weil Windows-1252 und ISO-8859-1 sich im Bereich 0x80–0x9F unterscheiden — genau dort, wo Ä, Ö und Ü landen.
 
 **stderr ist in PowerShell 5.1 kein Fehler, wird aber als solcher behandelt.** Der grösste Fallstrick. Sobald der Ausgabestrom eines nativen Programms umgeleitet wird, verpackt PowerShell jede stderr-Zeile in einen ErrorRecord und setzt `$?` auf false. Unter `$ErrorActionPreference = 'Stop'` bricht das Skript dadurch ab, obwohl das Programm mit Exit-Code 0 endet. Das trifft hier alle drei Werkzeuge: ffmpeg schreibt sämtliche Messwerte nach stderr, pymss die Fortschrittsanzeige, yt-dlp gelegentliche Warnungen. `Invoke-Native` in `_common.ps1` kapselt das an einer Stelle und wertet allein `$LASTEXITCODE` aus.
 

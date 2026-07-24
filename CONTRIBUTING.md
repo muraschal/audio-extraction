@@ -17,33 +17,26 @@ unversioniert.
 
 ## Vor jedem Pull Request
 
-Es gibt keine CI, die dir das abnimmt. Diese drei Schritte laufen von Hand:
-
-**1. Syntax prüfen.** Alle Skripte müssen fehlerfrei parsen:
+**1. Die Prüfroutine laufen lassen.** Ein Befehl deckt sechs Prüfungen ab:
 
 ```powershell
-Get-ChildItem scripts\*.ps1 | ForEach-Object {
-    $e = $null
-    [System.Management.Automation.Language.Parser]::ParseFile($_.FullName, [ref]$null, [ref]$e) | Out-Null
-    if ($e) { "FEHLER $($_.Name): $($e[0].Message)" } else { "OK $($_.Name)" }
-}
+.\scripts\check-docs.ps1
 ```
 
-**2. Kodierung prüfen.** Jede `.ps1`-Datei braucht ein UTF-8-BOM
-(`EF BB BF`). Ohne BOM liest Windows PowerShell 5.1 sie in der ANSI-Codepage,
-und Umlaute kommen falsch an — im schlimmsten Fall parst die Datei nicht mehr:
+Geprüft werden die Syntax aller Skripte, das UTF-8-BOM in den `.ps1`-Dateien
+und dessen Abwesenheit in Markdown, doppelt kodierte Umlaute, die Anker der
+Inhaltsverzeichnisse und alle relativen Verweise.
 
-```powershell
-Get-ChildItem scripts\*.ps1 | ForEach-Object {
-    $b = [System.IO.File]::ReadAllBytes($_.FullName)[0..2]
-    "{0,-20} {1}" -f $_.Name, (($b | ForEach-Object { $_.ToString('X2') }) -join ' ')
-}
-```
+Die Auswahl ist nicht willkürlich: Jede dieser Prüfungen fängt einen Fehler ab,
+der in diesem Repository tatsächlich vorkam. Dieselbe Routine läuft in der CI,
+du siehst das Ergebnis also vorab.
 
-Markdown-Dateien tragen dagegen kein BOM.
+Zeigt eine Datei absichtlich eine doppelt kodierte Zeichenfolge — etwa um
+genau diesen Fehler zu erklären —, trägt die Zeile den Marker `mojibake-ok`.
+In Markdown geht das als HTML-Kommentar am Zeilenende.
 
-**3. Einen echten Durchlauf machen.** Skripte, die nur parsen, sind nicht
-getestet:
+**2. Einen echten Durchlauf machen.** Skripte, die nur parsen, sind nicht
+getestet, und das kann die CI nicht für dich erledigen:
 
 ```powershell
 .\scripts\fetch.ps1 -Url "<eine-url>" -Name "test"

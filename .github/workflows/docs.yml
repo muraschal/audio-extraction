@@ -1,0 +1,58 @@
+name: Dokumentation
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: Skripte und Kodierung
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      # Prueft Syntax, BOM-Regeln, Mojibake, Anker und relative Verweise.
+      # Dasselbe Skript laesst sich lokal vor einem Pull Request ausfuehren.
+      - name: check-docs
+        shell: pwsh
+        run: ./scripts/check-docs.ps1
+
+      - name: PSScriptAnalyzer
+        shell: pwsh
+        run: |
+          Set-PSRepository PSGallery -InstallationPolicy Trusted
+          Install-Module PSScriptAnalyzer -Force -Scope CurrentUser
+          $found = Invoke-ScriptAnalyzer -Path ./scripts -Recurse `
+                     -Settings ./.github/PSScriptAnalyzerSettings.psd1
+          if ($found) {
+            $found | Format-Table -AutoSize | Out-String | Write-Host
+            exit 1
+          }
+          Write-Host 'Keine Befunde.'
+
+  links:
+    name: Verweise
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      # Externe Verweise sind nicht Teil des Pflicht-Gates: Dienste antworten
+      # zeitweise mit 403 oder Ratenbegrenzung, was einen Pull Request sonst
+      # ohne eigenes Verschulden blockiert. Der Lauf meldet, blockiert aber nicht.
+      - name: lychee
+        uses: lycheeverse/lychee-action@v2
+        continue-on-error: true
+        with:
+          args: >-
+            --no-progress
+            --exclude "youtu\.be/XXXXXXXXXXX"
+            --exclude "img\.shields\.io"
+            --exclude "github\.com/muraschal/audio-extraction/(compare|releases)"
+            --accept 200,204,206,403,405
+            README.md CONTRIBUTING.md CHANGELOG.md docs/
+          fail: false

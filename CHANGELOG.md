@@ -4,7 +4,27 @@ Alle nennenswerten Änderungen an diesem Projekt. Das Format folgt
 [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), die Versionierung
 [Semantic Versioning](https://semver.org/lang/de/).
 
-## [Unveröffentlicht]
+## [1.2.0] — 2026-07-24
+
+### Hinzugefügt
+
+- `docs/erste-schritte.md`: Anleitung ohne Vorkenntnisse, vom leeren Rechner
+  bis zum fertigen Instrumental, mit Abschnitt zu häufigen Problemen und einer
+  kurzen Begriffserklärung. Nach Diátaxis war der Typ „Tutorial" bisher nicht
+  abgedeckt; das README setzt PowerShell- und git-Kenntnisse voraus.
+- `scripts/check-docs.ps1`: prüft Syntax, BOM-Regeln, doppelt kodierte
+  Umlaute, Anker und relative Verweise. Jede Prüfung fängt einen Fehler ab,
+  der in diesem Repository tatsächlich vorkam.
+- GitHub Actions unter `.github/workflows/docs.yml` mit `check-docs.ps1`,
+  PSScriptAnalyzer und einer Verweisprüfung. Externe Verweise melden nur und
+  blockieren keinen Pull Request, weil Dienste zeitweise mit 403 oder
+  Ratenbegrenzung antworten.
+- Issue-Formular und Pull-Request-Vorlage unter `.github/`.
+
+### Geändert
+
+- `CONTRIBUTING.md` ersetzt die drei manuellen Prüfschritte durch den Aufruf
+  von `check-docs.ps1`.
 
 ## [1.1.0] — 2026-07-24
 
@@ -45,6 +65,6 @@ Alle nennenswerten Änderungen an diesem Projekt. Das Format folgt
 - `README.md` und `docs/messungen.md` mit auf einer RTX 5080 gemessenen Werten.
 - `.gitignore` nach dem Allowlist-Prinzip.
 
-[Unveröffentlicht]: https://github.com/muraschal/audio-extraction/compare/v1.1.0...HEAD
+[1.2.0]: https://github.com/muraschal/audio-extraction/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/muraschal/audio-extraction/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/muraschal/audio-extraction/releases/tag/v1.0.0

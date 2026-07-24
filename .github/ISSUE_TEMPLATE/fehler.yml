@@ -1,0 +1,59 @@
+name: Fehler melden
+description: Etwas funktioniert nicht wie beschrieben
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Danke fürs Melden. Die Felder unten sind das, was zur Eingrenzung
+        erfahrungsgemäss wirklich nötig ist.
+
+  - type: textarea
+    id: was-passiert
+    attributes:
+      label: Was passiert
+      description: Was hast du erwartet, und was ist stattdessen passiert?
+    validations:
+      required: true
+
+  - type: textarea
+    id: befehl
+    attributes:
+      label: Der Aufruf
+      description: Der vollständige Befehl und die Fehlermeldung im Wortlaut.
+      render: powershell
+    validations:
+      required: true
+
+  - type: input
+    id: powershell
+    attributes:
+      label: PowerShell-Version
+      description: "Ausgabe von: $PSVersionTable.PSVersion"
+      placeholder: "5.1.26200.1000"
+    validations:
+      required: true
+
+  - type: input
+    id: gpu
+    attributes:
+      label: Grafikkarte und CUDA
+      description: Was meldete `setup.ps1` in der Zeile CUDA?
+      placeholder: "RTX 5080, CUDA ja"
+    validations:
+      required: true
+
+  - type: input
+    id: modell
+    attributes:
+      label: Verwendetes Modell
+      placeholder: "bs_roformer_voc_hyperacev2"
+
+  - type: textarea
+    id: messung
+    attributes:
+      label: Ausgabe von compare.ps1
+      description: |
+        Nur bei Trennungsproblemen. Die Messwerte sagen mehr aus als eine
+        Beschreibung des Klangs.
+      render: text

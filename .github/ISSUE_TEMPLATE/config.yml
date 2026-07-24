@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Anleitung für Einsteiger
+    url: https://github.com/muraschal/audio-extraction/blob/main/docs/erste-schritte.md
+    about: Schritt-für-Schritt vom leeren Rechner bis zum fertigen Instrumental, samt Abschnitt zu häufigen Problemen.
+  - name: Gemessene Werte
+    url: https://github.com/muraschal/audio-extraction/blob/main/docs/messungen.md
+    about: Laufzeiten, Pegel und der Vergleich der Modelle auf echtem Material.
