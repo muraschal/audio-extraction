@@ -1,28 +1,28 @@
-<#
+﻿<#
 .SYNOPSIS
     Vergleicht mehrere Trennungsergebnisse objektiv miteinander.
 
 .DESCRIPTION
     Misst je Datei Format, integrierte Lautheit (EBU R128) und RMS-Pegel und
-    bildet anschliessend fuer jedes Dateipaar das Differenzsignal.
+    bildet anschliessend für jedes Dateipaar das Differenzsignal.
 
     Der Differenz-RMS ist die eigentlich interessante Zahl. Er beantwortet:
-    wie weit unterscheiden sich zwei Versionen ueberhaupt? Liegt die Differenz
+    wie weit unterscheiden sich zwei Versionen überhaupt? Liegt die Differenz
     40 dB oder mehr unter dem Signalpegel, ist der Unterschied praktisch nicht
-    hoerbar und die aufwendigere Variante ist verschenkte Rechenzeit. Liegt sie
-    bei 25 bis 30 dB darunter, lohnt sich das Gegenhoeren.
+    hörbar und die aufwendigere Variante ist verschenkte Rechenzeit. Liegt sie
+    bei 25 bis 30 dB darunter, lohnt sich das Gegenhören.
 
-    Ersetzt kein Hoeren. Kein Messwert sagt, ob eine uebrig gebliebene Silbe
-    stoert oder ob die Becken metallisch klingen - er sagt nur, wo es sich
-    lohnt, genau hinzuhoeren.
+    Ersetzt kein Hören. Kein Messwert sagt, ob eine übrig gebliebene Silbe
+    stört oder ob die Becken metallisch klingen — er sagt nur, wo es sich
+    lohnt, genau hinzuhören.
 
 .PARAMETER Files
     Zwei oder mehr zu vergleichende Audiodateien.
 
 .PARAMETER WriteDiff
-    Schreibt die Differenzsignale zusaetzlich als FLAC in den angegebenen
-    Ordner, um 20 dB angehoben. Was darin zu hoeren ist, ist exakt das, worin
-    sich die beiden Versionen unterscheiden - der schnellste Weg, den
+    Schreibt die Differenzsignale zusätzlich als FLAC in den angegebenen
+    Ordner, um 20 dB angehoben. Was darin zu hören ist, ist exakt das, worin
+    sich die beiden Versionen unterscheiden — der schnellste Weg, den
     Unterschied zweier Modelle zu beurteilen.
 
 .EXAMPLE
@@ -41,14 +41,14 @@ $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot '_common.ps1')
 
 Assert-Tool -Name 'ffmpeg'  -Hint "Installierbar mit 'winget install Gyan.FFmpeg'." | Out-Null
-Assert-Tool -Name 'ffprobe' -Hint 'Gehoert zur ffmpeg-Installation.'                | Out-Null
+Assert-Tool -Name 'ffprobe' -Hint 'Gehört zur ffmpeg-Installation.'                 | Out-Null
 
 foreach ($f in $Files) {
     if (-not (Test-Path $f)) { throw "Datei nicht gefunden: $f" }
 }
 
-# Hinweis fuer spaetere Aenderungen: 'Diff' ist in PowerShell ein Alias fuer
-# Compare-Object. Eine Funktion dieses Namens wuerde nicht greifen, der Aufruf
+# Hinweis für spätere Änderungen: 'Diff' ist in PowerShell ein Alias für
+# Compare-Object. Eine Funktion dieses Namens würde nicht greifen, der Aufruf
 # landete stattdessen bei Compare-Object. Daher die Verb-Nomen-Namen.
 
 function Get-RmsLevel {
@@ -60,7 +60,7 @@ function Get-RmsLevel {
 
     $output = Invoke-Native -FilePath 'ffmpeg' -Arguments $ffArgs -Capture
 
-    # astats gibt den RMS je Kanal aus und zuletzt fuer die Summe - daher -Last 1.
+    # astats gibt den RMS je Kanal aus und zuletzt für die Summe — daher -Last 1.
     $line = $output | Select-String -Pattern 'RMS level dB:' | Select-Object -Last 1
     if (-not $line) { return $null }
 
@@ -89,8 +89,8 @@ $stats = @{}
 foreach ($f in $Files) {
     $item = Get-Item $f
 
-    # Kein Leerzeichen nach dem Komma: PowerShell wuerde den Ausdruck sonst als
-    # zwei Argumente uebergeben und ffprobe meldet 'sample_rate was already
+    # Kein Leerzeichen nach dem Komma: PowerShell würde den Ausdruck sonst als
+    # zwei Argumente übergeben und ffprobe meldet 'sample_rate was already
     # specified'.
     $format = (& ffprobe -v error -select_streams a:0 `
                  -show_entries stream=codec_name,sample_rate -of csv=p=0 $f) -join ','
@@ -111,7 +111,7 @@ Write-Host '(Differenz-RMS, und wie weit er unter dem Signalpegel liegt)'
 
 if ($WriteDiff) { New-Item -ItemType Directory -Force -Path $WriteDiff | Out-Null }
 
-# Eine Spur wird invertiert und beide summiert - das ergibt das Differenzsignal.
+# Eine Spur wird invertiert und beide summiert — das ergibt das Differenzsignal.
 # normalize=0 ist zwingend, sonst halbiert amix die Pegel und die Zahlen stimmen nicht.
 $graph = '[1:a]volume=-1[b];[0:a][b]amix=inputs=2:duration=shortest:normalize=0[m];[m]astats=metadata=0'
 

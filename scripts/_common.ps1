@@ -1,5 +1,5 @@
-<#
-    Gemeinsame Hilfsfunktionen. Wird von den uebrigen Skripten per Dot-Sourcing
+﻿<#
+    Gemeinsame Hilfsfunktionen. Wird von den übrigen Skripten per Dot-Sourcing
     eingebunden und ist nicht zum direkten Aufruf gedacht.
 #>
 
@@ -11,15 +11,15 @@ function Invoke-Native {
     .DESCRIPTION
         In Windows PowerShell 5.1 verpackt jede stderr-Zeile eines nativen
         Programms einen ErrorRecord, sobald der Ausgabestrom umgeleitet wird.
-        Unter $ErrorActionPreference = 'Stop' bricht das Skript dadurch ab -
+        Unter $ErrorActionPreference = 'Stop' bricht das Skript dadurch ab —
         auch dann, wenn das Programm sauber mit Exit-Code 0 endet.
 
         Das ist keine Randerscheinung, sondern der Normalfall: ffmpeg schreibt
-        saemtliche Messwerte nach stderr, pymss die Fortschrittsanzeige,
-        yt-dlp gelegentlich Warnungen. Alle drei wuerden das Skript ohne diese
+        sämtliche Messwerte nach stderr, pymss die Fortschrittsanzeige, yt-dlp
+        gelegentlich Warnungen. Alle drei würden das Skript ohne diese
         Behandlung mitten im Lauf abbrechen.
 
-        Massgeblich fuer Erfolg oder Misserfolg ist deshalb allein
+        Massgeblich für Erfolg oder Misserfolg ist deshalb allein
         $LASTEXITCODE.
 
     .PARAMETER FilePath
@@ -29,8 +29,8 @@ function Invoke-Native {
         Argumentliste.
 
     .PARAMETER Capture
-        Gibt die zusammengefuehrte Ausgabe als Zeichenkettenfeld zurueck,
-        statt sie auf die Konsole durchzureichen.
+        Gibt die zusammengeführte Ausgabe als Zeichenkettenfeld zurück, statt
+        sie auf die Konsole durchzureichen.
     #>
     [CmdletBinding()]
     param(
@@ -49,8 +49,8 @@ function Invoke-Native {
     else {
         # stderr wird bewusst in den Ausgabestrom umgeleitet und zu Text
         # gewandelt. Ohne diese Umwandlung reicht PowerShell die ErrorRecords
-        # weiter, und beim Aufrufer erscheint gewoehnliche Fortschrittsausgabe
-        # als 'NativeCommandError' - obwohl nichts fehlgeschlagen ist.
+        # weiter, und beim Aufrufer erscheint gewöhnliche Fortschrittsausgabe
+        # als 'NativeCommandError' — obwohl nichts fehlgeschlagen ist.
         & $FilePath @Arguments 2>&1 | ForEach-Object {
             if ($_ -is [System.Management.Automation.ErrorRecord]) { $_.ToString() } else { $_ }
         }

@@ -1,10 +1,10 @@
-<#
+﻿<#
 .SYNOPSIS
-    Richtet die vollstaendige Trennungs-Umgebung ein: venv, PyTorch mit CUDA, pymss, yt-dlp.
+    Richtet die vollständige Trennungs-Umgebung ein: venv, PyTorch mit CUDA, pymss, yt-dlp.
 
 .DESCRIPTION
     Legt eine virtuelle Umgebung an und installiert darin den kompletten Stack.
-    Der PyTorch-Index wird anhand der gefundenen GPU gewaehlt: Blackwell-Karten
+    Der PyTorch-Index wird anhand der gefundenen GPU gewählt: Blackwell-Karten
     (RTX 50xx, Compute Capability 12.0) brauchen zwingend cu128 oder neuer, die
     Standard-Wheels von PyPI laufen dort nur auf der CPU.
 
@@ -14,7 +14,7 @@
     Zielpfad der virtuellen Umgebung. Standard: .venv im Repository-Wurzelverzeichnis.
 
 .PARAMETER TorchIndex
-    Ueberschreibt den automatisch gewaehlten PyTorch-Index, etwa fuer aeltere
+    Überschreibt den automatisch gewählten PyTorch-Index, etwa für ältere
     CUDA-Versionen (cu126) oder eine reine CPU-Installation
     (https://download.pytorch.org/whl/cpu).
 
@@ -38,18 +38,18 @@ Write-Host '== Voraussetzungen ==' -ForegroundColor Cyan
 Write-Host "  py     -> $(Assert-Tool -Name 'py'     -Hint 'Python von python.org installieren.')"
 Write-Host "  ffmpeg -> $(Assert-Tool -Name 'ffmpeg' -Hint "Installierbar mit 'winget install Gyan.FFmpeg'.")"
 
-# GPU ermitteln, um den passenden PyTorch-Build zu waehlen.
+# GPU ermitteln, um den passenden PyTorch-Build zu wählen.
 if (-not $TorchIndex) {
     $gpu = $null
     try { $gpu = (nvidia-smi --query-gpu=name --format=csv,noheader) 2>$null } catch { }
 
     if ($gpu) {
         Write-Host "  GPU  -> $gpu"
-        # cu128 deckt Blackwell (sm_120) ab und laeuft ebenso auf Ada und Ampere.
+        # cu128 deckt Blackwell (sm_120) ab und läuft ebenso auf Ada und Ampere.
         $TorchIndex = 'https://download.pytorch.org/whl/cu128'
     }
     else {
-        Write-Warning 'Keine NVIDIA-GPU gefunden. Es wird der CPU-Build installiert; die Trennung laeuft dann um ein Vielfaches langsamer.'
+        Write-Warning 'Keine NVIDIA-GPU gefunden. Es wird der CPU-Build installiert; die Trennung läuft dann um ein Vielfaches langsamer.'
         $TorchIndex = 'https://download.pytorch.org/whl/cpu'
     }
 }
@@ -65,7 +65,7 @@ else {
 
 $python = Join-Path $VenvPath 'Scripts\python.exe'
 if (-not (Test-Path $python)) {
-    throw "Interpreter nicht gefunden unter $python - ist die venv vollstaendig angelegt?"
+    throw "Interpreter nicht gefunden unter $python — ist die venv vollständig angelegt?"
 }
 
 Write-Host "`n== Pakete ==" -ForegroundColor Cyan
@@ -80,7 +80,7 @@ Invoke-Native -FilePath $python -Arguments @('-m', 'pip', 'install', 'torch', 't
 Write-Host '  pymss ...'
 Invoke-Native -FilePath $python -Arguments @('-m', 'pip', 'install', 'pymss') | Out-Null
 
-Write-Host "`n== Pruefung ==" -ForegroundColor Cyan
+Write-Host "`n== Prüfung ==" -ForegroundColor Cyan
 & $python -c @"
 import torch
 print(f'  torch      {torch.__version__}')
@@ -91,4 +91,4 @@ else:
     print('  CUDA       nein (CPU-Betrieb)')
 "@
 
-Write-Host "`nFertig. Naechster Schritt: .\scripts\fetch.ps1 -Url <youtube-url>" -ForegroundColor Green
+Write-Host "`nFertig. Nächster Schritt: .\scripts\fetch.ps1 -Url <youtube-url>" -ForegroundColor Green

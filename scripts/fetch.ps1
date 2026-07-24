@@ -1,16 +1,16 @@
-<#
+﻿<#
 .SYNOPSIS
-    Laedt die beste verfuegbare Tonspur einer Video-URL und legt sie als WAV ab.
+    Lädt die beste verfügbare Tonspur einer Video-URL und legt sie als WAV ab.
 
 .DESCRIPTION
-    Holt via yt-dlp die hoechstbitratige Audiospur, behaelt das Original als
-    Referenz und erzeugt daraus eine 24-Bit-WAV fuer die Trennung.
+    Holt via yt-dlp die höchstbitratige Audiospur, behält das Original als
+    Referenz und erzeugt daraus eine 24-Bit-WAV für die Trennung.
 
-    Zur Quellqualitaet: YouTube liefert verlustbehaftetes Opus oder AAC. Die
+    Zur Quellqualität: YouTube liefert verlustbehaftetes Opus oder AAC. Die
     Umwandlung nach WAV stellt nichts wieder her, sie verhindert nur weitere
     Verluste in der Verarbeitungskette. Wo eine gekaufte WAV oder FLAC
-    existiert, ist diese der deutlich bessere Ausgangspunkt - der Unterschied
-    im Endergebnis ist groesser als der zwischen zwei Trennungsmodellen.
+    existiert, ist diese der deutlich bessere Ausgangspunkt — der Unterschied
+    im Endergebnis ist grösser als der zwischen zwei Trennungsmodellen.
 
 .PARAMETER Url
     Video-URL, aus der die Tonspur geholt wird.
@@ -22,11 +22,11 @@
     Basisname der Zieldatei ohne Endung. Standard: der Videotitel.
 
 .PARAMETER FormatId
-    Erzwingt eine bestimmte yt-dlp-Format-ID. Ohne Angabe waehlt yt-dlp
+    Erzwingt eine bestimmte yt-dlp-Format-ID. Ohne Angabe wählt yt-dlp
     'bestaudio'. Mit -ListFormats siehst du, was zur Auswahl steht.
 
 .PARAMETER ListFormats
-    Listet nur die verfuegbaren Audioformate auf und laedt nichts.
+    Listet nur die verfügbaren Audioformate auf und lädt nichts.
 
 .EXAMPLE
     .\scripts\fetch.ps1 -Url "https://youtu.be/XXXXXXXXXXX" -ListFormats
@@ -49,7 +49,7 @@ $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path $PSScriptRoot -Parent
 $ytdlp    = Join-Path $repoRoot '.venv\Scripts\yt-dlp.exe'
 
-if (-not (Test-Path $ytdlp)) { throw "yt-dlp nicht gefunden. Zuerst .\scripts\setup.ps1 ausfuehren." }
+if (-not (Test-Path $ytdlp)) { throw "yt-dlp nicht gefunden. Zuerst .\scripts\setup.ps1 ausführen." }
 Assert-Tool -Name 'ffmpeg' -Hint "Installierbar mit 'winget install Gyan.FFmpeg'." | Out-Null
 
 if ($ListFormats) {
@@ -77,11 +77,11 @@ $fields = $meta | Where-Object { $_ -notmatch '^\s*(WARNING|ERROR|\[)' }
 
 $title = $fields[0]
 Write-Host "Titel   : $title"
-Write-Host "Laenge  : $($fields[1])"
+Write-Host "Länge   : $($fields[1])"
 Write-Host "Codec   : $($fields[2]) @ $($fields[3]) kbps"
 
 if (-not $Name) {
-    # Fuer Dateisysteme unzulaessige Zeichen ersetzen.
+    # Für Dateisysteme unzulässige Zeichen ersetzen.
     $Name = ($title -replace '[\\/:*?"<>|]', '_').Trim()
 }
 
@@ -95,18 +95,18 @@ $original = Get-ChildItem $OutDir -File |
     Where-Object { $_.BaseName -eq $Name -and $_.Extension -ne '.wav' } |
     Select-Object -First 1
 
-if (-not $original) { throw "Nach dem Download wurde keine Quelldatei gefunden. Pruefe die Ausgabe von yt-dlp." }
+if (-not $original) { throw "Nach dem Download wurde keine Quelldatei gefunden. Prüfe die Ausgabe von yt-dlp." }
 
 $wav = Join-Path $OutDir "$Name.wav"
 Write-Host "`nWandle nach 24-Bit-WAV ..."
 
 # Keine Neuabtastung: die Abtastrate der Quelle bleibt erhalten. Die Modelle
-# rechnen zwar intern mit 44,1 kHz, aber dieser eine Resample-Schritt gehoert
-# in die Trennung und nicht zusaetzlich schon hierhin.
+# rechnen zwar intern mit 44,1 kHz, aber dieser eine Resample-Schritt gehört
+# in die Trennung und nicht zusätzlich schon hierhin.
 Invoke-Native -FilePath 'ffmpeg' -Arguments @(
     '-hide_banner', '-loglevel', 'error', '-y', '-i', $original.FullName, '-c:a', 'pcm_s24le', $wav
 ) | Out-Null
 
 $size = [math]::Round((Get-Item $wav).Length / 1MB, 2)
 Write-Host "`nBereit: $wav ($size MB)" -ForegroundColor Green
-Write-Host "Naechster Schritt: .\scripts\separate.ps1 -Path `"$wav`""
+Write-Host "Nächster Schritt: .\scripts\separate.ps1 -Path `"$wav`""
